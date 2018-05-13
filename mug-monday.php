@@ -35,7 +35,7 @@ function mug_monday_register_mug_monday_post_type() {
 		'singular_name'      => _x( 'Mug Monday', 'post type singular name', 'mug-monday' ),
 		'menu_name'          => _x( 'Mug Mondays', 'admin menu', 'mug-monday' ),
 		'name_admin_bar'     => _x( 'Mug Monday', 'add new on admin bar', 'mug-monday' ),
-		'add_new'            => _x( 'Add New', 'book', 'mug-monday' ),
+		'add_new'            => _x( 'Add New', 'mug-monday' ),
 		'add_new_item'       => __( 'Add New Mug Monday', 'mug-monday' ),
 		'new_item'           => __( 'New Mug Monday', 'mug-monday' ),
 		'edit_item'          => __( 'Edit Mug Monday', 'mug-monday' ),
@@ -62,6 +62,33 @@ function mug_monday_register_mug_monday_post_type() {
     register_post_type( 'mug-monday', $args );
 }
 add_action( 'init', 'mug_monday_register_mug_monday_post_type' );
+
+function mug_monday_change_title_text( $title ){
+     $screen = get_current_screen();
+	 $count_posts = wp_count_posts('mug-monday');
+     $pages = $count_posts->publish;
+	 $draft_posts = $count_posts->draft;
+	 $totalPosts = $pages + $draft_posts;
+     echo $pages;
+     if ( 'mug-monday' == $screen->post_type ) {
+          return __('Mug Monday #', 'mug-monday') . $totalPosts . __(' ', 'mug-monday') . current_time( 'mysql' );
+     }
+}
+add_filter( 'enter_title_here', 'mug_monday_change_title_text' );
+
+function mug_monday_add_custom_title( $data, $postarr ) {
+    if($data['post_type'] == 'mug-monday') {
+        if(empty($data['post_title'])) {
+			$count_posts = wp_count_posts('mug-monday');
+	        $pages = $count_posts->publish;
+			$draft_posts = $count_posts->draft;
+			$totalPosts = $pages + $draft_posts;
+            $data['post_title'] = __('Mug Monday #', 'mug-monday') . $totalPosts . __(' ', 'mug-monday') . current_time( 'mysql' );
+        }
+    }
+    return $data;
+}
+add_filter('wp_insert_post_data', 'mug_monday_add_custom_title', 10, 2 );
 
 function mug_monday_rewrite_flush() {
     mug_monday_register_mug_monday_post_type();

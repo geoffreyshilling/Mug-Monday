@@ -3,7 +3,7 @@
 Plugin Name: Mug Monday
 Plugin URI:  https://geoffreyshilling.com/plugins/mug-monday/
 Description: More to come...
-Version:     0.2
+Version:     0.1
 Author:      Geoffrey Shilling
 Author URI:  https://geoffreyshilling.com/
 Text Domain: mug-monday
@@ -69,7 +69,7 @@ function mug_monday_change_title_text( $title ){
      $pages = $count_posts->publish;
 	 $draft_posts = $count_posts->draft;
 	 $totalPosts = $pages + $draft_posts;
-     echo $pages;
+
      if ( 'mug-monday' == $screen->post_type ) {
           return __('Mug Monday #', 'mug-monday') . $totalPosts . __(' ', 'mug-monday') . current_time( 'mysql' );
      }
@@ -85,6 +85,8 @@ function mug_monday_add_custom_title( $data, $postarr ) {
 			$totalPosts = $pages + $draft_posts;
             $data['post_title'] = __('Mug Monday #', 'mug-monday') . $totalPosts . __(' ', 'mug-monday') . current_time( 'mysql' );
         }
+
+
     }
     return $data;
 }
@@ -109,4 +111,53 @@ add_action( 'pre_get_posts', 'add_mug_monday_to_query' );
 
 add_theme_support( 'post-thumbnails', array('post', 'page','mug-monday'));
 
+function mug_monday_add_default_taxonomy( $post_id ) {
+
+	// Check if 'Mug Monday' category already exists
+	$term = term_exists( 'Mug Monday', 'category' );
+	if ( $term !== 0 && $term !== null ) {
+	    // Mug Monday category already exists
+	} else {
+		 wp_create_category('Mug Monday');
+	}
+	// An array of IDs of categories we to add to this post.
+	$cat_ids = array( get_cat_ID( 'Mug Monday' ) );
+	$term_taxonomy_ids = wp_set_object_terms( $post_id, $cat_ids, 'category', true );
+
+	$term = term_exists( 'Coffee', 'post_tag' );
+	if ( $term !== 0 && $term !== null ) {
+		
+	    // Coffee tag already exists
+			 wp_create_tag('Coffee');
+	} else {
+		 wp_create_tag('Coffee');
+	}
+
+	// An array of IDs of tags to add to this post.
+	//$tag_ids2 = get_term_by('name', 'Coffee', 'post_tag');
+	$tag_ids2 = array( get_term_by('name', 'Coffee', 'post_tag') );
+
+	$tag_by_id = $tag_ids2->term_id;
+
+	/*
+	 * If this was coming from the database or another source, we would need to make sure
+	 * these were integers:
+
+	$cat_ids = array_map( 'intval', $cat_ids );
+	$cat_ids = array_unique( $cat_ids );
+
+	 */
+
+	// Add these categories, note the last argument is true.
+	//$term_taxonomy_ids = wp_set_object_terms( $post_id, $cat_ids, 'category', true );
+
+		$term_taxonomy_ids = wp_set_object_terms( $post_id, $tag_by_id, 'post_tag', true );
+
+	if ( is_wp_error( $term_taxonomy_ids ) ) {
+	    // There was an error somewhere and the terms couldn't be set.
+	} else {
+	    // Success! These categories were added to the post.
+	}
+}
+add_action( 'save_post', 'mug_monday_add_default_taxonomy' );
 ?>

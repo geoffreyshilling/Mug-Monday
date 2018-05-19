@@ -55,7 +55,7 @@ function mug_monday_register_mug_monday_post_type() {
             array( 'core/image', array(
             ) ),
             array( 'core/paragraph', array(
-                'placeholder' => 'Add notes about this mug including when you got it, where it came from...',
+                'placeholder' => 'Add notes about this mug including when you got it, where it came from, and other interesting information.',
             ) ),
         ),
     );
@@ -71,7 +71,7 @@ function mug_monday_change_title_text( $title ){
 	 $totalPosts = $pages + $draft_posts;
 
      if ( 'mug-monday' == $screen->post_type ) {
-          return __('Mug Monday #', 'mug-monday') . $totalPosts . __(' ', 'mug-monday') . current_time( 'mysql' );
+          return __('Mug Monday #', 'mug-monday') . $totalPosts . __(' - Week of ', 'mug-monday');
      }
 }
 add_filter( 'enter_title_here', 'mug_monday_change_title_text' );
@@ -83,7 +83,7 @@ function mug_monday_add_custom_title( $data, $postarr ) {
 	        $pages = $count_posts->publish;
 			$draft_posts = $count_posts->draft;
 			$totalPosts = $pages + $draft_posts;
-            $data['post_title'] = __('Mug Monday #', 'mug-monday') . $totalPosts . __(' ', 'mug-monday') . current_time( 'mysql' );
+            $data['post_title'] = __('Mug Monday #', 'mug-monday') . $totalPosts . __(' - Week of ', 'mug-monday');
         }
 
 
@@ -118,7 +118,14 @@ function mug_monday_add_default_taxonomy( $post_id ) {
 	if ( $term !== 0 && $term !== null ) {
 	    // Mug Monday category already exists
 	} else {
-		 wp_create_category('Mug Monday');
+ 		wp_insert_term(
+ 		  'Mug Monday', // the term
+ 		  'category', // the taxonomy
+ 		  array(
+ 			'description'=> 'A new coffee mug every Monday.',
+ 			'slug' => 'mug-monday',
+ 		  )
+ 		);
 	}
 	// An array of IDs of categories we to add to this post.
 	$cat_ids = array( get_cat_ID( 'Mug Monday' ) );
@@ -126,16 +133,22 @@ function mug_monday_add_default_taxonomy( $post_id ) {
 
 	$term = term_exists( 'Coffee', 'post_tag' );
 	if ( $term !== 0 && $term !== null ) {
-		
+		// wp_create_tag('Coffee123');
 	    // Coffee tag already exists
-			 wp_create_tag('Coffee');
+			// wp_create_tag('Coffee');
 	} else {
-		 wp_create_tag('Coffee');
+		wp_insert_term(
+		  'Coffee', // the term
+		  'post_tag', // the taxonomy
+		  array(
+			'description'=> 'Anything and everything coffee-related.',
+			'slug' => 'coffee',
+		  )
+		);
 	}
+	// An array of IDs of categories we to add to this post.
 
-	// An array of IDs of tags to add to this post.
-	//$tag_ids2 = get_term_by('name', 'Coffee', 'post_tag');
-	$tag_ids2 = array( get_term_by('name', 'Coffee', 'post_tag') );
+	$tag_ids2 = get_term_by('name', 'Coffee', 'post_tag');
 
 	$tag_by_id = $tag_ids2->term_id;
 

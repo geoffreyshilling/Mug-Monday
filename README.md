@@ -18,5 +18,5 @@ Create a "Mug Monday" custom post type using a Gutenberg template.  A default "M
 
 ## Changelog ##
 
-### 0.2.0 ###
-* First release
+### 0.2.0, May 20, 2018 ###
+* Initial release

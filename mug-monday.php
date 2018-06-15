@@ -151,60 +151,64 @@ add_action( 'pre_get_posts', 'add_my_post_types_to_query' );
 add_theme_support( 'post-thumbnails', array('post', 'page','mug-monday'));
 
 function mug_monday_add_default_taxonomy( $post_id ) {
+	// Only add Mug Monday taxonomy to Mug Monday post types
+	$screen = get_current_screen();
+	if( 'mug-monday' === $screen->post_type ) {
+		// Check if 'Mug Monday' category already exists
+		$term = term_exists( 'Mug Monday', 'category' );
+		if ( $term !== 0 && $term !== null ) {
+		    // Mug Monday category already exists
+		} else {
+			wp_insert_term(
+				'Mug Monday', // the term
+				'category', // the taxonomy
+				array(
+				'description' => 'A new coffee mug every Monday.',
+				'slug' => 'mug-monday',
+				)
+	 		);
+		}
 
-	// Check if 'Mug Monday' category already exists
-	$term = term_exists( 'Mug Monday', 'category' );
-	if ( $term !== 0 && $term !== null ) {
-	    // Mug Monday category already exists
-	} else {
-		wp_insert_term(
-			'Mug Monday', // the term
-			'category', // the taxonomy
-			array(
-			'description' => 'A new coffee mug every Monday.',
-			'slug' => 'mug-monday',
-			)
- 		);
-	}
-	// An array of IDs of categories we to add to this post.
-	$cat_ids = array( get_cat_ID( 'Mug Monday' ) );
-	$term_taxonomy_ids = wp_set_object_terms( $post_id, $cat_ids, 'category', true );
+		// An array of IDs of categories we to add to this post.
+		$cat_ids = array( get_cat_ID( 'Mug Monday' ) );
+		$term_taxonomy_ids = wp_set_object_terms( $post_id, $cat_ids, 'category', true );
 
-	$term = term_exists( 'Coffee', 'post_tag' );
-	if ( 0 !== $term && null !== $term ) {
-	    // Coffee tag already exists
-	} else {
-		wp_insert_term(
-		  'Coffee', // the term
-		  'post_tag', // the taxonomy
-		  array(
-			'description'=> 'Anything and everything coffee-related.',
-			'slug' => 'coffee',
-		  )
-		);
-	}
-	// An array of IDs of categories we to add to this post.
-	$tag_ids = get_term_by('name', 'Coffee', 'post_tag');
+		$term = term_exists( 'Coffee', 'post_tag' );
+		if ( 0 !== $term && null !== $term ) {
+		    // Coffee tag already exists
+		} else {
+			wp_insert_term(
+			  'Coffee', // the term
+			  'post_tag', // the taxonomy
+			  array(
+				'description'=> 'Anything and everything coffee-related.',
+				'slug' => 'coffee',
+			  )
+			);
+		}
+		// An array of IDs of categories we to add to this post.
+		$tag_ids = get_term_by('name', 'Coffee', 'post_tag');
 
-	$tag_by_id = $tag_ids->term_id;
+		$tag_by_id = $tag_ids->term_id;
 
-	/*
-	 * If this was coming from the database or another source, we would need to make sure
-	 * these were integers:
+		/*
+		 * If this was coming from the database or another source, we would need to make sure
+		 * these were integers:
 
-	$cat_ids = array_map( 'intval', $cat_ids );
-	$cat_ids = array_unique( $cat_ids );
+		$cat_ids = array_map( 'intval', $cat_ids );
+		$cat_ids = array_unique( $cat_ids );
 
-	 */
+		 */
 
-	// Add these categories, note the last argument is true.
+		// Add these categories, note the last argument is true.
 
-		$term_taxonomy_ids = wp_set_object_terms( $post_id, $tag_by_id, 'post_tag', true );
+			$term_taxonomy_ids = wp_set_object_terms( $post_id, $tag_by_id, 'post_tag', true );
 
-	if ( is_wp_error( $term_taxonomy_ids ) ) {
-	    // There was an error somewhere and the terms couldn't be set.
-	} else {
-	    // Success! These categories were added to the post.
+		if ( is_wp_error( $term_taxonomy_ids ) ) {
+		    // There was an error somewhere and the terms couldn't be set.
+		} else {
+		    // Success! These categories were added to the post.
+		}
 	}
 }
 add_action( 'save_post', 'mug_monday_add_default_taxonomy' );

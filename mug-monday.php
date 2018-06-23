@@ -117,6 +117,8 @@ function mug_monday_add_default_title( $data, $postarr ) {
 		  * posts and post drafts in the database.
 		  * Example format:  'Mug Monday #1 - Week of '
 		  */
+
+
 		$data['post_title'] = __('Mug Monday #', 'mug-monday') . $totalPosts . __(' - Week of ', 'mug-monday');
         }
 
@@ -140,20 +142,19 @@ function mug_monday_rewrite_flush() {
 register_activation_hook( __FILE__, 'mug_monday_rewrite_flush' );
 
 
-// Show posts of 'post' and 'movie' post types on home page
-function add_my_post_types_to_query( $query ) {
+// Show posts of 'post' and 'mug monday' post types on home page
+function add_mug_monday_post_types_to_query( $query ) {
   if ( is_home() && $query->is_main_query() )
     $query->set( 'post_type', array( 'post', 'mug-monday' ) );
   return $query;
 }
-add_action( 'pre_get_posts', 'add_my_post_types_to_query' );
+add_action( 'pre_get_posts', 'add_mug_monday_post_types_to_query' );
 
 add_theme_support( 'post-thumbnails', array('post', 'page','mug-monday'));
 
-function mug_monday_add_default_taxonomy( $post_id ) {
+function mug_monday_add_default_taxonomy( $post_id, $data, $postarr ) {
 	// Only add Mug Monday taxonomy to Mug Monday post types
-	$screen = get_current_screen();
-	if( 'mug-monday' === $screen->post_type ) {
+
 		// Check if 'Mug Monday' category already exists
 		$term = term_exists( 'Mug Monday', 'category' );
 		if ( $term !== 0 && $term !== null ) {
@@ -204,12 +205,18 @@ function mug_monday_add_default_taxonomy( $post_id ) {
 
 			$term_taxonomy_ids = wp_set_object_terms( $post_id, $tag_by_id, 'post_tag', true );
 
+
+
 		if ( is_wp_error( $term_taxonomy_ids ) ) {
 		    // There was an error somewhere and the terms couldn't be set.
 		} else {
 		    // Success! These categories were added to the post.
 		}
-	}
+
+
+
+
 }
-add_action( 'save_post', 'mug_monday_add_default_taxonomy' );
+add_action( 'save_post_mug-monday', 'mug_monday_add_default_taxonomy' );
+
 ?>
